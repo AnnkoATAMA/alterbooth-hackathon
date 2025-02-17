@@ -28,7 +28,7 @@ async def create_item(item: TargetCreate, db: AsyncSession = Depends(get_db)):
         print("✅ [DEBUG] ユーザーが存在しています")
 
         # ✅ 新しい目標の追加
-        db_target = Target(user_id=item.user_id, target=item.target, status=False)
+        db_target = Target(user_id=item.user_id, target=item.target, status=False, weight=1)
         db.add(db_target)  # 🔥 まず `add` してから
         await db.commit()  # 🔥 ここで `commit` する
         await db.refresh(db_target)  # 🔥 `commit` の後に `refresh`
