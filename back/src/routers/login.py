@@ -23,7 +23,7 @@ async def create_user(response: Response, item: UserCreate, db: AsyncSession = D
             key="user_id",
             value=str(existing_user.user_id),
             httponly=True,
-            secure=False,  # HTTPS環境ならTrue
+            secure=False,
             samesite="Lax"
         )
         return {"success": True, "userId": existing_user.user_id}

@@ -11,7 +11,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({ name, email, password }),
-        credentials: 'include' // Cookie を受け取るため必須
+        credentials: 'include'
     });
 
     const result = await response.json();
