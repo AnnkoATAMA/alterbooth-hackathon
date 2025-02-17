@@ -1,76 +1,40 @@
-// src/target.js
+document.getElementById("goalForm").addEventListener("submit", async function (event) {
+    event.preventDefault();
 
-let goals = [];
+    const goalInput = document.getElementById("goalInput").value;
+    const userId = document.getElementById("userId").value; // 🔥 追加
 
-function saveGoal(goal) {
-    goals.push(goal);
-    localStorage.setItem('goals', JSON.stringify(goals));
-}
-
-function loadGoals() {
-    const savedGoals = localStorage.getItem('goals');
-    if (savedGoals) {
-        goals = JSON.parse(savedGoals);
+    if (!goalInput) {
+        alert("目標を入力してください");
+        return;
     }
-}
 
-function displayGoals() {
-    const goalList = document.getElementById('goal-list');
-    goalList.innerHTML = '';
-    goals.forEach((goal, index) => {
-        const listItem = document.createElement('li');
-        listItem.textContent = `${index + 1}: ${goal}`;
-        goalList.appendChild(listItem);
-    });
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    loadGoals();
-    displayGoals();
-
-    const goalForm = document.getElementById('goal-form');
-    goalForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-        const goalInput = document.getElementById('goal-input');
-        const goal = goalInput.value;
-        if (goal) {
-            saveGoal(goal);
-            displayGoals();
-            goalInput.value = '';
+    try {
+        const response = await fetch("http://localhost:8000/api/target/create", {  // ✅ URL から userId を削除
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({ user_id: userId, target: goalInput })  // ✅ user_id を body に含める
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
-    });
+
+        const result = await response.json();
+        console.log("保存成功:", result);
+        addGoalToList(result.target);
+        document.getElementById("goalInput").value = "";
+
+    } catch (error) {
+        console.error("エラー:", error);
+        alert("目標の保存に失敗しました");
+    }
 });
-
-document.getElementById('goalForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const goalInput = document.getElementById('goalInput').value;
-    const userId = document.getElementById('userId').value;
-
-    const response = await fetch('http://localhost:8000/api/goals', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ userId, goal: goalInput })
-    });
-
-    const newGoal = await response.json();
-    addGoalToList(newGoal);
-    document.getElementById('goalInput').value = '';
-});
-
-async function fetchGoals() {
-    const userId = document.getElementById('userId').value;
-    const response = await fetch(`http://localhost:8000/api/goals/${userId}`);
-    const goals = await response.json();
-    goals.forEach(addGoalToList);
-}
-
 function addGoalToList(goal) {
-    const goalList = document.getElementById('goals');
-    const li = document.createElement('li');
-    li.textContent = goal.goal;
-    goalList.appendChild(li);
+    const goalsList = document.getElementById("goals");
+    const listItem = document.createElement("li");
+    listItem.textContent = goal;
+    goalsList.appendChild(listItem);
 }
-
-fetchGoals();

@@ -1,4 +1,31 @@
 services:
+  front:
+    image: node:latest
+    working_dir: /app
+    volumes:
+      - ./front:/app
+    ports:
+      - "8080:8080"
+    command: ["npx", "serve", ".", "-l", "8080"]
+
+  fastapi:
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./back/src:/back
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "http://localhost:8000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 3s
+
   mysql:
     image: mysql:latest
     volumes:
@@ -7,8 +34,11 @@ services:
       - ./mysql/mysql.cnf:/etc/mysql/conf.d/my.cnf
     ports:
       - "3306:3306"
-    env_file:
-      - ./mysql/conf.env
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: alterbooth
+      MYSQL_USER: alterbooth
+      MYSQL_PASSWORD: password
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p $$MYSQL_ROOT_PASSWORD" ]
       interval: 5s
