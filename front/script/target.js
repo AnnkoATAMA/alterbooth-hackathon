@@ -21,6 +21,84 @@ async function loadGoals() {
     }
 }
 
+async function addSubTask(parentId) {
+    const userId = document.getElementById("userId").value;
+    const subTaskName = prompt("子タスク名を入力してください");
+
+    if (!subTaskName) return;
+
+    try {
+        const response = await fetch("http://localhost:8000/api/target/create", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({ user_id: userId, target: subTaskName, parent_id: parentId })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        console.log("✅ 子タスク追加成功");
+        loadGoals();
+    } catch (error) {
+        console.error("エラー:", error);
+        alert("子タスクの追加に失敗しました");
+    }
+}
+
+function displayTargets(targets, parentElement = null) {
+    const goalsList = parentElement || document.getElementById("goals");
+    goalsList.innerHTML = '';
+
+    targets.forEach(target => {
+        const listItem = document.createElement("li");
+
+        const taskText = document.createElement("span");
+        taskText.textContent = `${target.target} ${target.status ? "✅" : "❌"}`;
+        listItem.appendChild(taskText);
+
+        const addSubTaskButton = document.createElement("button");
+        addSubTaskButton.textContent = "＋ 子タスク追加";
+        addSubTaskButton.style.marginLeft = "10px";
+        addSubTaskButton.addEventListener("click", () => addSubTask(target.target_id));
+        listItem.appendChild(addSubTaskButton);
+
+        const toggleButton = document.createElement("button");
+        toggleButton.textContent = target.status ? "未達成にする" : "達成";
+        toggleButton.style.marginLeft = "10px";
+        toggleButton.addEventListener("click", () => toggleGoalStatus(target.target_id, !target.status));
+        listItem.appendChild(toggleButton);
+
+        const weightSelect = document.createElement("select");
+        ["高い", "普通", "低い"].forEach((label, index) => {
+            const option = document.createElement("option");
+            option.value = index + 1;
+            option.textContent = label;
+            if (index + 1 === target.weight) {
+                option.selected = true;
+            }
+            weightSelect.appendChild(option);
+        });
+
+        weightSelect.style.marginLeft = "10px";
+        weightSelect.addEventListener("change", () => updateGoalWeight(target.target_id, weightSelect.value));
+        listItem.appendChild(weightSelect);
+
+        if (target.subtasks && target.subtasks.length > 0) {
+            const subList = document.createElement("ul");
+            displayTargets(target.subtasks, subList);
+            listItem.appendChild(subList);
+        }
+
+        goalsList.appendChild(listItem);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', loadGoals);
+
 document.getElementById("goalForm").addEventListener("submit", async function (event) {
     event.preventDefault();
 
@@ -45,54 +123,15 @@ document.getElementById("goalForm").addEventListener("submit", async function (e
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const result = await response.json();
-        console.log("保存成功:", result);
+        console.log("✅ 目標の追加成功");
         document.getElementById("goalInput").value = "";
 
-        addGoalToList(result.target_id, goalInput, false, 1);
+        loadGoals();
     } catch (error) {
         console.error("エラー:", error);
         alert("目標の保存に失敗しました");
     }
 });
-
-function addGoalToList(targetId, goal, status, weight) {
-    const goalsList = document.getElementById("goals");
-    const listItem = document.createElement("li");
-
-    const importanceText = weight === 1 ? "高い" : weight === 2 ? "普通" : "低い";
-    listItem.textContent = `${goal} (${importanceText}) ${status ? "✅ 達成済" : "❌ 未達成"}`;
-
-    const toggleButton = document.createElement("button");
-    toggleButton.textContent = status ? "未達成にする" : "達成";
-    toggleButton.addEventListener("click", () => toggleGoalStatus(targetId, !status));
-
-    const weightSelect = document.createElement("select");
-    ["高い", "普通", "低い"].forEach((label, index) => {
-        const option = document.createElement("option");
-        option.value = index + 1;
-        option.textContent = label;
-        if (index + 1 === weight) {
-            option.selected = true;
-        }
-        weightSelect.appendChild(option);
-    });
-
-    weightSelect.addEventListener("change", () => updateGoalWeight(targetId, weightSelect.value));
-
-    listItem.appendChild(toggleButton);
-    listItem.appendChild(weightSelect);
-    goalsList.appendChild(listItem);
-}
-
-function displayTargets(targets) {
-    const goalsList = document.getElementById("goals");
-    goalsList.innerHTML = '';
-
-    targets.forEach(target => {
-        addGoalToList(target.target_id, target.target, target.status, target.weight);
-    });
-}
 
 async function toggleGoalStatus(targetId, newStatus) {
     if (!targetId) {
@@ -116,8 +155,7 @@ async function toggleGoalStatus(targetId, newStatus) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const result = await response.json();
-        console.log("状態変更成功:", result);
+        console.log("✅ 状態変更成功");
         loadGoals();
     } catch (error) {
         console.error("エラー:", error);
@@ -147,14 +185,12 @@ async function updateGoalWeight(targetId, newWeight) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const result = await response.json();
-        console.log("重要度変更成功:", result);
+        console.log("✅ 重要度変更成功");
         loadGoals();
     } catch (error) {
         console.error("エラー:", error);
         alert("重要度の変更に失敗しました");
     }
 }
-
 
 document.addEventListener('DOMContentLoaded', loadGoals);
