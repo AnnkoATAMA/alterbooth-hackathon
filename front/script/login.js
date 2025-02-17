@@ -1,5 +1,6 @@
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
+
     const name = document.getElementById('name').value;
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
@@ -9,15 +10,17 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ name, email, password })
+        body: JSON.stringify({ name, email, password }),
+        credentials: 'include'
     });
 
     const result = await response.json();
 
     if (result.success) {
-        // ✅ ログイン成功時に userId を保存し、画面遷移
-        localStorage.setItem('userId', result.userId);
-        window.location.href = 'target.html';
+        setTimeout(() => {
+            location.replace('index.html');
+        }, 500);
+
     } else {
         alert('ログインに失敗しました。');
     }
