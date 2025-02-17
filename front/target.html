@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <title>目標設定画面</title>
+        <link rel="stylesheet" type="text/css" href="styles/styles.css">
+    </head>
+    <body>
+        <h1>目標設定</h1>
+        <form id="goalForm">
+            <label for="goalInput">目標を入力してください:</label>
+            <input type="text" id="goalInput" required>
+            <input type="hidden" id="userId" value="1"> <!-- ユーザーIDを設定 -->
+            <button type="submit">保存</button>
+        </form>
+        <div id="goalList">
+            <h2>過去の目標</h2>
+            <ul id="goals"></ul>
+        </div>
+        <script src="./script/target.js"></script>
+    </body>
+</html>

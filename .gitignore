@@ -1,0 +1,5 @@
+conf.env
+mysql.cnf
+mysql/data/mysql.sock
+mysql/data
+__pycache__

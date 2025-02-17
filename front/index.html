@@ -1,10 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+
 </head>
 <body>
-
+さんのページ
+<div class="navbar">
+    <button><a href="target.html">aaaa</a></button>
+    <button onclick="location.href='page2.html'">Page 2</button>
+    <button onclick="location.href='page3.html'">Page 3</button>
+</div>
+<div class="content">
+    <div class="header">
+        <div id="welcome-message"></div>
+    </div>
+    <!-- ここに他のコンテンツを追加 -->
+</div>
+<script>
+    // ローカルストレージからユーザー名を取得して表示
+    const username = localStorage.getItem('username') || 'テスト';
+    document.getElementById('welcome-message').innerText = `ようこそ、${username}さん！`;
+</script>
 </body>
 </html>
