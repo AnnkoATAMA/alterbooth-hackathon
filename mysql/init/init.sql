@@ -15,6 +15,7 @@ CREATE TABLE target(
                        user_id INT NOT NULL,
                        target VARCHAR(255) NOT NULL,
                        status BOOLEAN NOT NULL DEFAULT FALSE,
+                       weight INT NOT NULL DEFAULT 1,
                        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                        CONSTRAINT fk_target_user FOREIGN KEY (user_id) REFERENCES users(user_id)
