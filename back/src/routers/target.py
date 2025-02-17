@@ -28,14 +28,14 @@ async def create_item(item: TargetCreate, db: AsyncSession = Depends(get_db)):
         print("✅ [DEBUG] ユーザーが存在しています")
 
         # ✅ 新しい目標の追加
-        db_target = Target(user_id=item.user_id, target=item.target)
+        db_target = Target(user_id=item.user_id, target=item.target, status=False)
         db.add(db_target)  # 🔥 まず `add` してから
         await db.commit()  # 🔥 ここで `commit` する
         await db.refresh(db_target)  # 🔥 `commit` の後に `refresh`
 
         print(f"🎯 [DEBUG] 目標が正常に追加されました: {db_target}")
 
-        return {"success": True, "target": db_target.target}
+        return {"success": True, "target_id": db_target.target_id, "target": db_target.target}
 
     except IntegrityError:
         await db.rollback()
