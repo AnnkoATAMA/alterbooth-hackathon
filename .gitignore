@@ -3,3 +3,5 @@ mysql.cnf
 mysql/data/mysql.sock
 mysql/data
 __pycache__
+
+.env
