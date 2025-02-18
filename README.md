@@ -23,17 +23,7 @@
 
 ---
 
-## 🛠 **プロジェクトの構成**
-### **Frontend**
-- **HTML / CSS / JavaScript**
-- **シンプル & 直感的なUIデザイン**
 
-### **Backend**
-- **FastAPI (Python)**
-- **MySQL（データベース）**
-- **SQLAlchemy（ORM）**
-
----
 
 ## 🚀 **アプリの使い方**
 ### **1. ログイン & 新規登録**
