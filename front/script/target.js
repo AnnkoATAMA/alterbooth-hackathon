@@ -5,7 +5,39 @@ document.addEventListener('DOMContentLoaded', () => {
     loadGoals();
     updateLevelUI();
 });
+document.getElementById("goalForm").addEventListener("submit", async function (event) {
+    event.preventDefault();
 
+    const goalInput = document.getElementById("goalInput").value;
+    const userId = document.getElementById("userId").value;
+
+    if (!goalInput) {
+        alert("目標を入力してください");
+        return;
+    }
+
+    try {
+        const response = await fetch("http://localhost:8000/api/target/create", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({ user_id: userId, target: goalInput })
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        console.log("✅ 目標の追加成功");
+        document.getElementById("goalInput").value = "";
+
+        loadGoals();
+    } catch (error) {
+        console.error("エラー:", error);
+        alert("目標の保存に失敗しました");
+    }
+});
 async function loadGoals() {
     const userId = document.getElementById("userId").value;
 
@@ -147,6 +179,35 @@ async function toggleGoalStatus(targetId, newStatus) {
     } catch (error) {
         console.error("エラー:", error);
         alert("状態変更に失敗しました");
+    }
+}
+async function updateGoalWeight(targetId, newWeight) {
+    if (!targetId) {
+        console.error("❌ エラー: targetId が undefined です");
+        return;
+    }
+
+    console.log(`🎯 [DEBUG] 重要度変更リクエスト: targetId=${targetId}, weight=${newWeight}`);
+
+    try {
+        const response = await fetch(`http://localhost:8000/api/weight/weight`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({ target_id: targetId, importance: Number(newWeight) })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        console.log("✅ 重要度変更成功");
+        loadGoals();
+    } catch (error) {
+        console.error("エラー:", error);
+        alert("重要度の変更に失敗しました");
     }
 }
 
