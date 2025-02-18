@@ -22,7 +22,6 @@ async def create_user(response: Response, item: UserCreate, db: AsyncSession = D
         response.set_cookie(
             key="user_id",
             value=str(existing_user.user_id),
-            httponly=True,
             secure=False,
             samesite="Lax"
         )
@@ -36,7 +35,6 @@ async def create_user(response: Response, item: UserCreate, db: AsyncSession = D
     response.set_cookie(
         key="user_id",
         value=str(db_user.user_id),
-        httponly=True,
         secure=False,
         samesite="Lax"
     )
