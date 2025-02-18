@@ -18,9 +18,11 @@ CREATE TABLE target(
     target VARCHAR(255) NOT NULL,
     status BOOLEAN NOT NULL DEFAULT FALSE,
     weight INT NOT NULL DEFAULT 1,
+    parent_id INT DEFAULT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_target_user FOREIGN KEY (user_id) REFERENCES users(user_id)
+    CONSTRAINT fk_target_user FOREIGN KEY (user_id) REFERENCES users(user_id),
+    CONSTRAINT fk_target_parent FOREIGN KEY (parent_id) REFERENCES target(target_id) ON DELETE CASCADE
 );
 
 CREATE TABLE rooms(
@@ -37,6 +39,7 @@ CREATE TABLE room_user(
     CONSTRAINT fk_room_user_room FOREIGN KEY (room_id) REFERENCES rooms(room_id),
     CONSTRAINT fk_room_user_user FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
+
 
 INSERT INTO users (user_id, name, email, password, created_at, updated_at)
 VALUES 
