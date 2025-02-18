@@ -3,48 +3,46 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Room Management</title>
+  <title>ルーム管理</title>
   <script src="./script/room.js" defer></script>
   <script src="./script/auth.js"></script>
-    <link rel="stylesheet" type="text/css" href="./styles/styles.css">
+  <link rel="stylesheet" type="text/css" href="./styles/styles.css">
 </head>
 <body>
-<h1>Room Management</h1>
+<h1>ルーム管理</h1>
 
 <!-- 所属グループ一覧 -->
-<h2>Your Rooms (Click to View Members & Tasks)</h2>
-<ul id="roomList">Loading...</ul>
+<h2>所属ルーム（クリックでメンバー & タスクを表示）</h2>
+<ul id="roomList">読み込み中...</ul>
 
 <!-- ルーム内のユーザー一覧 -->
-<h2>Room Members</h2>
-<ul id="userList">Select a room to see its members.</ul>
+<h2>ルームメンバー</h2>
+<ul id="userList">ルームを選択してください。</ul>
 
 <!-- ルーム内のタスク一覧 -->
-<h2>Room Tasks</h2>
-<ul id="taskList">Select a room to see tasks.</ul>
-
-
+<h2>ルームのタスク</h2>
+<ul id="taskList">ルームを選択してください。</ul>
 
 <!-- グループ作成フォーム -->
-<h2>Create Group</h2>
+<h2>新しいルームを作成</h2>
 <form id="createGroupForm">
-  <label for="groupName">Group Name:</label>
+  <label for="groupName">ルーム名:</label>
   <input type="text" id="groupName" required>
-  <button type="submit">Create Group</button>
+  <button type="submit">作成</button>
 </form>
 
 <!-- ユーザー追加フォーム -->
-<h2>Add User to Group</h2>
+<h2>ルームにユーザーを追加</h2>
 <form id="addUserForm">
-  <label for="roomId">Room ID:</label>
+  <label for="roomId">ルームID:</label>
   <input type="number" id="roomId" required>
 
-  <label for="userSelect">Select User:</label>
+  <label for="userSelect">ユーザーを選択:</label>
   <select id="userSelect">
-    <option value="">Loading...</option>
+    <option value="">読み込み中...</option>
   </select>
 
-  <button type="submit">Add User</button>
+  <button type="submit">追加</button>
 </form>
 
 <div id="responseMessage"></div>

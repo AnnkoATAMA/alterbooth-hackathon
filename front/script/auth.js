@@ -17,13 +17,6 @@ async function checkAuth() {
 
         const userData = await response.json();
         console.log("✅ [AUTH] 認証成功: ", userData);
-
-        if (userData.name) {
-            localStorage.setItem('username', userData.name);
-            localStorage.setItem('userId', userData.userId);
-
-        }
-
         return userData.userId;
     } catch (error) {
         console.warn("❌ [AUTH] 未ログイン: ", error);

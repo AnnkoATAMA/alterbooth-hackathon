@@ -1,15 +1,30 @@
 let xp = 0;
 let level = 1;
-
+let userId = null;
 document.addEventListener('DOMContentLoaded', () => {
     loadGoals();
     updateLevelUI();
 });
+async function getUserId() {
+    try {
+        const response = await fetch("http://localhost:8000/api/auth/check-auth", { method: "GET", credentials: "include" });
+        if (!response.ok) throw new Error("Unauthorized");
+
+        const data = await response.json();
+        userId = data.userId;
+        return userId;  // ✅ ここで userId を戻り値として返す
+    } catch (error) {
+        console.error("Failed to get user ID", error);
+        responseMessage.textContent = "User authentication failed.";
+        return null;  // ✅ エラー時に null を返す
+    }
+}
+
 document.getElementById("goalForm").addEventListener("submit", async function (event) {
     event.preventDefault();
 
     const goalInput = document.getElementById("goalInput").value;
-    const userId = document.getElementById("userId").value;
+    const userId = await getUserId();
 
     if (!goalInput) {
         alert("目標を入力してください");
@@ -39,7 +54,7 @@ document.getElementById("goalForm").addEventListener("submit", async function (e
     }
 });
 async function loadGoals() {
-    const userId = document.getElementById("userId").value;
+    const userId = await getUserId();
 
     if (!userId) {
         console.error("❌ [ERROR] userId が取得できていません");
@@ -62,7 +77,7 @@ async function loadGoals() {
 }
 
 async function addSubTask(parentId) {
-    const userId = document.getElementById("userId").value;
+    const userId = await getUserId();
     const subTaskName = prompt("子タスク名を入力してください");
 
     if (!subTaskName) return;
