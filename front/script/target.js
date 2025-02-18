@@ -1,3 +1,11 @@
+let xp = 0;
+let level = 1;
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadGoals();
+    updateLevelUI();
+});
+
 async function loadGoals() {
     const userId = document.getElementById("userId").value;
 
@@ -30,10 +38,7 @@ async function addSubTask(parentId) {
     try {
         const response = await fetch("http://localhost:8000/api/target/create", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
+            headers: { "Content-Type": "application/json", "Accept": "application/json" },
             body: JSON.stringify({ user_id: userId, target: subTaskName, parent_id: parentId })
         });
 
@@ -54,84 +59,66 @@ function displayTargets(targets, parentElement = null) {
     goalsList.innerHTML = '';
 
     targets.forEach(target => {
-        const listItem = document.createElement("li");
+        const card = document.createElement("div");
+        card.classList.add("task-card");
 
-        const taskText = document.createElement("span");
+        const taskHeader = document.createElement("div");
+        taskHeader.classList.add("task-header");
+
+        const taskText = document.createElement("h3");
         taskText.textContent = `${target.target} ${target.status ? "✅" : "❌"}`;
-        listItem.appendChild(taskText);
+        taskHeader.appendChild(taskText);
 
         const addSubTaskButton = document.createElement("button");
         addSubTaskButton.textContent = "＋ 子タスク追加";
-        addSubTaskButton.style.marginLeft = "10px";
+        addSubTaskButton.classList.add("add-btn");
         addSubTaskButton.addEventListener("click", () => addSubTask(target.target_id));
-        listItem.appendChild(addSubTaskButton);
+        taskHeader.appendChild(addSubTaskButton);
 
         const toggleButton = document.createElement("button");
         toggleButton.textContent = target.status ? "未達成にする" : "達成";
-        toggleButton.style.marginLeft = "10px";
+        toggleButton.classList.add("toggle-btn");
         toggleButton.addEventListener("click", () => toggleGoalStatus(target.target_id, !target.status));
-        listItem.appendChild(toggleButton);
+        taskHeader.appendChild(toggleButton);
 
         const weightSelect = document.createElement("select");
         ["高い", "普通", "低い"].forEach((label, index) => {
             const option = document.createElement("option");
             option.value = index + 1;
             option.textContent = label;
-            if (index + 1 === target.weight) {
-                option.selected = true;
-            }
+            if (index + 1 === target.weight) option.selected = true;
             weightSelect.appendChild(option);
         });
 
-        weightSelect.style.marginLeft = "10px";
         weightSelect.addEventListener("change", () => updateGoalWeight(target.target_id, weightSelect.value));
-        listItem.appendChild(weightSelect);
+        taskHeader.appendChild(weightSelect);
+
+        card.appendChild(taskHeader);
 
         if (target.subtasks && target.subtasks.length > 0) {
-            const subList = document.createElement("ul");
-            displayTargets(target.subtasks, subList);
-            listItem.appendChild(subList);
+            const toggleSubtasksButton = document.createElement("button");
+            toggleSubtasksButton.textContent = "▶ 子タスク表示";
+            toggleSubtasksButton.classList.add("toggle-subtasks");
+            let isSubtasksVisible = false;
+
+            const subTaskContainer = document.createElement("div");
+            subTaskContainer.classList.add("subtasks");
+            subTaskContainer.style.display = "none";
+
+            toggleSubtasksButton.addEventListener("click", () => {
+                isSubtasksVisible = !isSubtasksVisible;
+                subTaskContainer.style.display = isSubtasksVisible ? "block" : "none";
+                toggleSubtasksButton.textContent = isSubtasksVisible ? "▼ 子タスクを閉じる" : "▶ 子タスク表示";
+            });
+
+            card.appendChild(toggleSubtasksButton);
+            displayTargets(target.subtasks, subTaskContainer);
+            card.appendChild(subTaskContainer);
         }
 
-        goalsList.appendChild(listItem);
+        goalsList.appendChild(card);
     });
 }
-
-document.addEventListener('DOMContentLoaded', loadGoals);
-
-document.getElementById("goalForm").addEventListener("submit", async function (event) {
-    event.preventDefault();
-
-    const goalInput = document.getElementById("goalInput").value;
-    const userId = document.getElementById("userId").value;
-
-    if (!goalInput) {
-        alert("目標を入力してください");
-        return;
-    }
-
-    try {
-        const response = await fetch("http://localhost:8000/api/target/create", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            body: JSON.stringify({ user_id: userId, target: goalInput })
-        });
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        console.log("✅ 目標の追加成功");
-        document.getElementById("goalInput").value = "";
-
-        loadGoals();
-    } catch (error) {
-        console.error("エラー:", error);
-        alert("目標の保存に失敗しました");
-    }
-});
 
 async function toggleGoalStatus(targetId, newStatus) {
     if (!targetId) {
@@ -144,10 +131,7 @@ async function toggleGoalStatus(targetId, newStatus) {
     try {
         const response = await fetch(`http://localhost:8000/api/target/${targetId}/toggle`, {
             method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
+            headers: { "Content-Type": "application/json", "Accept": "application/json" },
             body: JSON.stringify({ target_id: targetId, status: newStatus })
         });
 
@@ -156,6 +140,9 @@ async function toggleGoalStatus(targetId, newStatus) {
         }
 
         console.log("✅ 状態変更成功");
+        if (newStatus) {
+            gainXP(10);
+        }
         loadGoals();
     } catch (error) {
         console.error("エラー:", error);
@@ -163,34 +150,32 @@ async function toggleGoalStatus(targetId, newStatus) {
     }
 }
 
-async function updateGoalWeight(targetId, newWeight) {
-    if (!targetId) {
-        console.error("❌ エラー: targetId が undefined です");
-        return;
+// XP & レベルアップ
+function gainXP(amount) {
+    xp += amount;
+    if (xp >= level * 100) {
+        levelUp();
     }
-
-    console.log(`🎯 [DEBUG] 重要度変更リクエスト: targetId=${targetId}, weight=${newWeight}`);
-
-    try {
-        const response = await fetch(`http://localhost:8000/api/weight/weight`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            body: JSON.stringify({ target_id: targetId, importance: Number(newWeight) })
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        console.log("✅ 重要度変更成功");
-        loadGoals();
-    } catch (error) {
-        console.error("エラー:", error);
-        alert("重要度の変更に失敗しました");
-    }
+    updateLevelUI();
 }
 
-document.addEventListener('DOMContentLoaded', loadGoals);
+function levelUp() {
+    level++;
+    xp = 0;
+    showEffect("🚀 レベルアップ!", true);
+}
+
+function updateLevelUI() {
+    document.getElementById("level-display").textContent = `レベル: ${level}`;
+    document.getElementById("xp-display").textContent = `XP: ${xp} / ${level * 100}`;
+    document.getElementById("xp-bar").style.width = `${(xp / (level * 100)) * 100}%`;
+}
+
+function showEffect(message, isBig = false) {
+    const effect = document.createElement("div");
+    effect.classList.add("effect");
+    if (isBig) effect.classList.add("big-effect");
+    effect.textContent = message;
+    document.body.appendChild(effect);
+    setTimeout(() => effect.remove(), 2000);
+}
