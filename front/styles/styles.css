@@ -138,6 +138,7 @@ button {
     text-transform: uppercase;
     cursor: pointer;
     box-shadow: 0 0 10px var(--shadow-color);
+    gap: 16px;
 }
 
 button:hover {
@@ -160,10 +161,41 @@ button:hover {
 
 .navbar {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
+    gap: 16px;
     padding: 10px 20px;
     background: var(--card-background);
     border-radius: 8px;
+    margin-bottom: 16px;
     box-shadow: 0 0 10px var(--shadow-color);
+}
+
+.add-btn {
+    background: var(--primary-color);
+    color: #000;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 0 10px var(--shadow-color);
+    gap: 16px;
+}
+
+.toggle-btn {
+    color: #000;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 0 10px var(--shadow-color);
+    gap: 16px;
+    margin: 8px;
+}
+
+.contaaa {
+    margin: 0 auto;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 }
