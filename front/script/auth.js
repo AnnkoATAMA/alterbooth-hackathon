@@ -20,6 +20,8 @@ async function checkAuth() {
 
         if (userData.name) {
             localStorage.setItem('username', userData.name);
+            localStorage.setItem('userId', userData.userId);
+
         }
 
         return userData.userId;

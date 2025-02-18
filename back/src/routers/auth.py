@@ -8,6 +8,7 @@ auth_router = APIRouter()
 @auth_router.get("/check-auth")
 async def check_auth(request: Request, db: AsyncSession = Depends(get_db)):
     user_id = request.cookies.get("user_id")
+    print(user_id)
 
     if not user_id:
         raise HTTPException(status_code=401, detail="Unauthorized")

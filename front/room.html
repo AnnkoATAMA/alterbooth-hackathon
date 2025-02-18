@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Room Management</title>
+  <script src="./script/room.js" defer></script>
+  <script src="./script/auth.js"></script>
+  <link rel="stylesheet" type="text/css" href="styles/styles.css">
+</head>
+<body>
+<h1>Room Management</h1>
+
+<!-- 所属グループ一覧 -->
+<h2>Your Rooms (Click to View Members & Tasks)</h2>
+<ul id="roomList">Loading...</ul>
+
+<!-- ルーム内のユーザー一覧 -->
+<h2>Room Members</h2>
+<ul id="userList">Select a room to see its members.</ul>
+
+<!-- ルーム内のタスク一覧 -->
+<h2>Room Tasks</h2>
+<ul id="taskList">Select a room to see tasks.</ul>
+
+
+<!-- グループ作成フォーム -->
+<h2>Create Group</h2>
+<form id="createGroupForm">
+  <label for="groupName">Group Name:</label>
+  <input type="text" id="groupName" required>
+  <button type="submit">Create Group</button>
+</form>
+
+<!-- ユーザー追加フォーム -->
+<h2>Add User to Group</h2>
+<form id="addUserForm">
+  <label for="roomId">Room ID:</label>
+  <input type="number" id="roomId" required>
+
+  <label for="userSelect">Select User:</label>
+  <select id="userSelect">
+    <option value="">Loading...</option>
+  </select>
+
+  <button type="submit">Add User</button>
+</form>
+
+<div id="responseMessage"></div>
+</body>
+</html>
